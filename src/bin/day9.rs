@@ -24,7 +24,7 @@ fn main() {
         }
     }
 
-    println!("{:?}", part1);
+    println!("Day 9 part 1: {:?}", part1);
 
     let mut check: Vec<Vec<bool>> = lines.iter()
         .map(|x| x.iter().map(|&y| y == 9).collect())
@@ -45,7 +45,7 @@ fn main() {
     basins.reverse();
     let part2 = basins[0] * basins[1] * basins[2];
 
-    println!("{:?}", part2);
+    println!("Day 9 part 2: {:?}", part2);
 }
 
 fn search_and_mark(x: usize, y: usize, check: &mut Vec<Vec<bool>>) -> u32 {
