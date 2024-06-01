@@ -18,6 +18,27 @@ fn main() {
 	let part1 = magnitude(folded);
 
 	println!("Day 18 part 1: {}", part1);
+
+	let mut part2 = 0;
+
+	for i in 0..mapped.len() {
+		for j in i+1..mapped.len() {
+			let x1 = mapped[i].clone();
+			let x2 = mapped[j].clone();
+			let v1 = magnitude(handle(V::Pair(Box::new((x1.clone(), x2.clone())))));
+			let v2 = magnitude(handle(V::Pair(Box::new((x2, x1)))));
+
+			if v1 > part2 {
+				part2 = v1;
+			}
+
+			if v2 > part2 {
+				part2 = v2;
+			}
+		}
+	}
+
+	println!("Day 18 part 2: {}", part2);
 }
 
 fn p(input: &str) -> (V, usize) {
