@@ -13,10 +13,11 @@ fn main() {
 	let mapped: Vec<_> = input.lines()
 		.map(|x| p(x).0)
 		.collect();
+	
+	let folded = mapped[1..].iter().fold(mapped[0].clone(), |a, x| handle(V::Pair(Box::new((a, x.clone())))));
+	let part1 = magnitude(folded);
 
-	let res = handle(mapped[0].clone());
-
-	println!("{:?}", res);
+	println!("Day 18 part 1: {}", part1);
 }
 
 fn p(input: &str) -> (V, usize) {
@@ -78,7 +79,6 @@ fn explode(x: V, depth: i32) -> (V, i32, i32, bool) {
 			if depth >= 4 && vi1 && vi2 {
 				let v1 = match x1 { V::Value(v) => *v, _ => 0 };
 				let v2 = match x2 { V::Value(v) => *v, _ => 0 };
-				println!("Exploded: {}, {}", v1, v2);
 				return (V::Value(0), v1, v2, true);
 			}
 			
@@ -101,7 +101,6 @@ fn explode(x: V, depth: i32) -> (V, i32, i32, bool) {
 fn split(x: V) -> (V, bool) {
 	match x {
 		V::Value(x) => if x > 9 {
-			println!("Split {}", x);
 			(V::Pair(Box::new((V::Value(x/2), V::Value(x - x/2)))), true)
 		} else {
 			(V::Value(x), false)
@@ -152,6 +151,18 @@ fn exploded_left(x: V, value: i32) -> V {
 		V::Pair(x) => {
 			let (x1, x2) = x.as_ref();
 			V::Pair(Box::new((exploded_left(x1.clone(), value), x2.clone())))
+		}
+	}
+}
+
+fn magnitude(x: V) -> usize {
+	match x {
+		V::Value(x) => x as usize,
+		V::Pair(x) => {
+			let (x1, x2) = x.as_ref();
+			let v1 = magnitude(x1.clone());
+			let v2 = magnitude(x2.clone());
+			return 3*v1 + 2*v2;
 		}
 	}
 }
