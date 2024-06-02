@@ -19,11 +19,18 @@ fn main() {
 		}
 	}
 
-	println!("{:?}", coords.len());
+	let mut part1 = coords.clone();
+	for i in 0..2 {
+		part1 = process(part1, translator, if i % 2 == 0 { "0" } else { "1" });
+	}
+	println!("Day 20 part 1: {}", part1.len());
 
-	let part1 = process(process(coords, translator, "0"), translator, "1").len();
+	let mut part2 = coords;
+	for i in 0..50 {
+		part2 = process(part2, translator, if i % 2 == 0 { "0" } else { "1" });
+	}
 
-	println!("Day 20 part 1: {}", part1);
+	println!("Day 20 part 2: {}", part2.len());
 }
 
 fn process(coords: HashSet<(i32, i32)>, translator: &str, outside_range: &str) -> HashSet<(i32, i32)>{
@@ -33,9 +40,6 @@ fn process(coords: HashSet<(i32, i32)>, translator: &str, outside_range: &str) -
 	let max_x = coords.iter().map(|(_, x)| *x).max().unwrap();
 	let min_y = coords.iter().map(|(y, _)| *y).min().unwrap();
 	let max_y = coords.iter().map(|(y, _)| *y).max().unwrap();
-
-	println!("Round {}, {}, {}, {}", min_x, max_x, min_y, max_y);
-
 
 	for y in min_y-2..max_y+2 {
 		for x in min_x-2..max_x+2 {
