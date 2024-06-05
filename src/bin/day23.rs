@@ -26,6 +26,12 @@ fn main() {
 		(r4b, 2, 8, 0),
 	].to_vec();
 
+	let part1 = part1(amphipods);
+	
+	println!("Day 23 part 1: {}", if part1 == i32::max_value() { 0 } else { part1 });
+}
+
+fn part1(amphipods: Vec<(char, i32, i32, i32)>) -> i32 {
 	let mut states = HashSet::new();
 	states.insert(amphipods);
 
@@ -171,10 +177,10 @@ fn main() {
 
 		states = new_states;
 
-		println!("{:?}", states.len());
+		println!("Current states: {:?}", states.len());
 
 		if states.len() == 0 {
-			break;
+			return min_score;
 		}
 
 		/*for state in states.iter() {
@@ -195,6 +201,4 @@ fn main() {
 			}
 		}*/
 	}
-	
-	println!("Day 23 part 1: {}", if min_score == i32::max_value() { 0 } else { min_score });
 }
