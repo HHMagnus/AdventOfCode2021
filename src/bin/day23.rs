@@ -15,7 +15,7 @@ fn main() {
 	let r4a = lines[2].chars().nth(9).unwrap();
 	let r4b = lines[3].chars().nth(9).unwrap();
 
-	let amphipods = [
+	let amphipods1 = [
 		(r1a, 1, 2, 0),
 		(r1b, 2, 2, 0),
 		(r2a, 1, 4, 0),
@@ -26,12 +26,33 @@ fn main() {
 		(r4b, 2, 8, 0),
 	].to_vec();
 
-	let part1 = part1(amphipods);
+	let amphipods2 = [
+		(r1a, 1, 2, 0),
+		(r2a, 1, 4, 0),
+		(r3a, 1, 6, 0),
+		(r4a, 1, 8, 0),
+		('D', 2, 2, 0),
+		('C', 2, 4, 0),
+		('B', 2, 6, 0),
+		('A', 2, 8, 0),
+		('D', 3, 2, 0),
+		('B', 3, 4, 0),
+		('A', 3, 6, 0),
+		('C', 3, 8, 0),
+		(r1b, 4, 2, 0),
+		(r2b, 4, 4, 0),
+		(r3b, 4, 6, 0),
+		(r4b, 4, 8, 0),
+	].to_vec();
+
+	let part1 = solve(amphipods1, 2);
+	let part2 = solve(amphipods2, 4);
 	
 	println!("Day 23 part 1: {}", if part1 == i32::max_value() { 0 } else { part1 });
+	println!("Day 23 part 2: {}", if part2 == i32::max_value() { 0 } else { part2 });
 }
 
-fn part1(amphipods: Vec<(char, i32, i32, i32)>) -> i32 {
+fn solve(amphipods: Vec<(char, i32, i32, i32)>, depth: i32) -> i32 {
 	let mut states = HashSet::new();
 	states.insert(amphipods);
 
@@ -59,18 +80,14 @@ fn part1(amphipods: Vec<(char, i32, i32, i32)>) -> i32 {
 					_ => panic!("Unknown c"),
 				};
 
-				if endx == x && (y == 2 || state.iter().any(|(c0, y0, x0, _)| x0 == &endx && y0 == &2 && c0 == &c)) {
+				if endx == x && ((y..=depth).all(|pre| state.iter().any(|(c0, y0, x0, _)| x0 == &endx && y0 == &pre && c0 == &c))) {
 					total += s;
 					continue;
 				}
 				win = false;
 
 				if y == 0 {
-					if state.iter().any(|(_, y0, x0, _)| y0 == &1 && x0 == &endx) {
-						continue;
-					}
-
-					if state.iter().any(|(c0, y0, x0, _)| y0 == &2 && x0 == &endx && &c != c0) {
+					if (1..=depth).any(|pre| state.iter().any(|(c0, y0, x0, _)| y0 == &pre && x0 == &endx && &c != c0)) {
 						continue;
 					}
 
@@ -89,14 +106,10 @@ fn part1(amphipods: Vec<(char, i32, i32, i32)>) -> i32 {
 					if currx != endx {
 						continue;
 					}
+
+					let ny = (1..=depth).filter(|pre| !state.iter().any(|(_, y0, x0, _)| y0 == pre && x0 == &endx)).max().unwrap();
 					
-					let ny = if state.iter().any(|(_, y0, x0, _)| y0 == &2 && x0 == &endx) {
-						moves += 1;
-						1
-					} else {
-						moves += 2;
-						2
-					};
+					moves += ny;
 
 					let n_amp = (c, ny, endx, s + moves * multiplier);
 
@@ -113,7 +126,7 @@ fn part1(amphipods: Vec<(char, i32, i32, i32)>) -> i32 {
 					continue;
 				}
 
-				if y == 2 && state.iter().any(|(_, y0, x0, _)| y0 == &1 && x0 == &x) {
+				if y > 1 && (1..y).any(|pre| state.iter().any(|(_, y0, x0, _)| y0 == &pre && x0 == &x)) {
 					continue;
 				}
 
