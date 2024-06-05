@@ -12,22 +12,56 @@ fn main() {
 		}).collect::<Vec<_>>())
 		.collect::<Vec<_>>();
 
-	let scan1 = &lines[0];
-	let scan2 = &lines[1];
+	let mut scanners = Vec::new();
 
-	let dist1 = distmap(scan1);
-	let dist2 = distmap(scan2);
-	
-	let mut mapping = Vec::new();
-	for dist in dist1 {
-		if let Some(corresponding) = dist2.iter().find(|(_, x)| x.iter().filter(|y| dist.1.contains(y)).count() > 10).map(|(y, _)| y) {
-			mapping.push((dist.0, *corresponding));
-		}
+	scanners.push([0, 0, 0]);
+
+	let mut beacons = HashSet::new();
+
+	for &line in &lines[0] {
+		beacons.insert(line);
 	}
 
-	let basis = find_basis(mapping[0], mapping[1]); 
+	let mut remaining = lines[1..].to_vec();
 
-	println!("{:?}", basis);
+	while remaining.len() != 0 {
+		let beaconsv = beacons.iter().map(|x| x.clone()).collect::<Vec<_>>();
+		let dist1 = distmap(&beaconsv);
+
+		let mut nrem = Vec::new();
+		
+		for rem in remaining {
+			let dist2 = distmap(&rem);
+			
+			let mut mapping = Vec::new();
+			for dist in dist1.clone() {
+				if let Some(corresponding) = dist2.iter().find(|(_, x)| x.iter().filter(|y| dist.1.contains(y)).count() > 10).map(|(y, _)| y) {
+					mapping.push((dist.0, *corresponding));
+				}
+			}
+			if mapping.len() < 2 {
+				nrem.push(rem);
+				continue;
+			}
+			
+			let basis = find_basis(mapping[0], mapping[1]); 
+
+			for beacon in rem.iter().map(|&p| transform(p, basis)).collect::<Vec<_>>() {
+				beacons.insert(beacon);
+			}
+
+			scanners.push(basis.1);
+			
+		}
+
+		remaining = nrem;
+	}
+
+	println!("Day 19 part 1: {}", beacons.len());
+
+	let part2 = scanners.iter().flat_map(|x| scanners.iter().filter_map(move |y| if x == y { None } else { Some((x[0] - y[0]).abs() + (x[1] - y[1]).abs() + (x[2] - y[2]).abs()) })).max().unwrap();
+	
+	println!("Day 19 part 2: {}", part2);
 
 }
 
